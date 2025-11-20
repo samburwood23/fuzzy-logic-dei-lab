@@ -1,5 +1,6 @@
 # women_dei_stress_fuzzy.py
 from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import numpy as np
 import skfuzzy as fuzz
@@ -8,7 +9,14 @@ import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
+@app.route("/ui")
+def ui_home():
+    return render_template("index.html")
 
+@app.route("/frontend")
+def ui_frontend():
+    return render_template("frontend.html")
+    
 def create_women_dei_stress_fuzzy_system():
     """
     Fuzzy Logic System for Women's Workplace Stress & DEI Analysis
