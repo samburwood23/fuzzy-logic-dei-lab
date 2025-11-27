@@ -3,11 +3,14 @@ from flask_cors import CORS
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
-
 app = Flask(__name__, 
             static_folder='../public',
             template_folder='../public')
 CORS(app)
+# Add this route at the top:
+@app.route('/')
+def home():
+    return send_from_directory('../public', 'index.html')
 
 # Define fuzzy variables
 work_hours = ctrl.Antecedent(np.arange(20, 81, 1), 'work_hours')
