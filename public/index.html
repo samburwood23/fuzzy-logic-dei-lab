@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workplace Stress & DEI Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1em;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #764ba2;
+        }
+        
+        .value-display {
+            display: inline-block;
+            float: right;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .result-item {
+            margin-bottom: 20px;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+        
+        .low { background: linear-gradient(90deg, #28a745, #20c997); }
+        .moderate { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+        .high { background: linear-gradient(90deg, #dc3545, #c82333); }
+        
+        .recommendations {
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .recommendations h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .recommendations ul {
+            list-style-position: inside;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .recommendations li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Workplace Stress & DEI Analyzer</h1>
+        <p class="subtitle">Fuzzy Logic-Based Mental Health Assessment</p>
+        
+        <div id="status" class="status">Checking connection...</div>
+        
+        <form id="assessmentForm">
+            <div class="form-group">
+                <label>
+                    Work Hours per Week
+                    <span class="value-display" id="work_hours_val">40</span>
+                </label>
+                <input type="range" id="work_hours" min="20" max="80" value="40" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    Company DEI Support Level (0-10)
+                    <span class="value-display" id="dei_support_val">5</span>
+                </label>
+                <input type="range" id="dei_support" min="0" max="10" value="5" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    Remote Work Flexibility (0-10)
+                    <span class="value-display" id="remote_flexibility_val">5</span>
+                </label>
+                <input type="range" id="remote_flexibility" min="0" max="10" value="5" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    Mental Health Benefits Quality (0-10)
+                    <span class="value-display" id="mental_health_benefits_val">5</span>
+                </label>
+                <input type="range" id="mental_health_benefits" min="0" max="10" value="5" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    Manager Support Quality (0-10)
+                    <span class="value-display" id="manager_support_val">5</span>
+                </label>
+                <input type="range" id="manager_support" min="0" max="10" value="5" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    Discrimination Experience (0-10)
+                    <span class="value-display" id="discrimination_exp_val">0</span>
+                </label>
+                <input type="range" id="discrimination_exp" min="0" max="10" value="0" step="1">
+            </div>
+            
+            <button type="submit">🔍 Analyze Workplace Stress</button>
+        </form>
+        
+        <div id="results" class="results">
+            <div class="result-item">
+                <div class="result-label">Stress Level</div>
+                <div class="progress-bar">
+                    <div id="stress_bar" class="progress-fill" style="width: 0%">0%</div>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Burnout Risk</div>
+                <div class="progress-bar">
+                    <div id="burnout_bar" class="progress-fill" style="width: 0%">0%</div>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Intervention Priority</div>
+                <div class="progress-bar">
+                    <div id="priority_bar" class="progress-fill" style="width: 0%">0%</div>
+                </div>
+            </div>
+            
+            <div class="recommendations">
+                <h3>📋 Recommendations</h3>
+                <ul id="recommendations_list"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update for Vercel deployment - use relative path
+        const API_URL = '/api';
+        
+        // Update value displays
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            input.addEventListener('input', function() {
+                document.getElementById(this.id + '_val').textContent = this.value;
+            });
+        });
+        
+        // Check backend connection
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                const statusDiv = document.getElementById('status');
+                statusDiv.textContent = '✅ Connected to Backend';
+                statusDiv.className = 'status connected';
+            } catch (error) {
+                const statusDiv = document.getElementById('status');
+                statusDiv.textContent = '❌ Backend Disconnected';
+                statusDiv.className = 'status disconnected';
+            }
+        }
+        
+        checkConnection();
+        
+        // Handle form submission
+        document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                work_hours: parseInt(document.getElementById('work_hours').value),
+                dei_support: parseInt(document.getElementById('dei_support').value),
+                remote_flexibility: parseInt(document.getElementById('remote_flexibility').value),
+                mental_health_benefits: parseInt(document.getElementById('mental_health_benefits').value),
+                manager_support: parseInt(document.getElementById('manager_support').value),
+                discrimination_exp: parseInt(document.getElementById('discrimination_exp').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const results = await response.json();
+                displayResults(results);
+            } catch (error) {
+                alert('Error analyzing data: ' + error.message);
+            }
+        });
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            // Update progress bars
+            updateBar('stress_bar', results.stress_level);
+            updateBar('burnout_bar', results.burnout_risk);
+            updateBar('priority_bar', results.intervention_priority);
+            
+            // Update recommendations
+            const recList = document.getElementById('recommendations_list');
+            recList.innerHTML = '';
+            results.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recList.appendChild(li);
+            });
+        }
+        
+        function updateBar(id, value) {
+            const bar = document.getElementById(id);
+            const percentage = (value / 10) * 100;
+            
+            setTimeout(() => {
+                bar.style.width = percentage + '%';
+                bar.textContent = value.toFixed(1) + ' / 10';
+                
+                if (value < 4) {
+                    bar.className = 'progress-fill low';
+                } else if (value < 7) {
+                    bar.className = 'progress-fill moderate';
+                } else {
+                    bar.className = 'progress-fill high';
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
